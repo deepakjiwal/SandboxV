@@ -17,20 +17,18 @@ class User(Base):
 class FEATURE(Base):
   __tablename__ = 'FEATURE'
   id = Column(Integer, primary_key = True, autoincrement = True)
-  name = Column(String(40), nullable=False)
-  description = Column(String(500), nullable=False)
-  upCount = Column(Integer)
-  downCount = Column(Integer)
+  name = Column(String(40), nullable = False)
+  description = Column(String(500), nullable = False)
   created_by = Column(Integer)
   status = Column(String(20))
   feature_type = Column(String(100))
 
-  def __init__(self, name, description = None, upCount = 0, downCount = 0, created_by = 0):
+  def __init__(self, name, description = None, upCount = 0, downCount = 0, created_by = 0, status = None, feature_type = None):
     self.name = name
     self.description = description
-    self.upCount = 0
-    self.downCount = 0
-    self.created_by = 0
+    self.created_by = created_by
+    self.status = status
+    self.feature_type = feature_type
 
 class Doctor_Feature(Base):                                       #Association object - for implementing ManytoMany relationship
   __tablename__ = 'DOCTOR_FEATURE_ASSOCIATION'
@@ -41,7 +39,7 @@ class Doctor_Feature(Base):                                       #Association o
   comment = Column(String(200))
 
   def __init__(self, user_id, feature_id, like = 0, comment = None):
-      self.user_id=user_id
+      self.user_id = user_id
       self.feature_id=feature_id
       self.like = like
       self.comment = comment
