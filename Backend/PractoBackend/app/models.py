@@ -4,14 +4,14 @@ from database import Base
 
 class User(Base):
   __tablename__ = 'USER'
-  id = Column(Integer,primary_key = True, autoincrement=True)
-  practo_id = Column(Integer, nullable=False, unique=True)
+  practo_id = Column(Integer, primary_key = True)
   name = Column(String(50), nullable=False)
   contact_number = Column(String(15))
   email = Column(String(50))
 
-  def __init__(self, name, contact_number = None, email = None):
+  def __init__(self, practo_id, name, contact_number = None, email = None):
     self.name = name
+    self.practo_id = practo_id
     self.contact_number = contact_number
     self.email = email
 
