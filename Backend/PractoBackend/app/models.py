@@ -14,7 +14,7 @@ class User(Base):
     self.contact_number = contact_number
     self.email = email
 
-class FEATURE(Base):
+class Feature(Base):
   __tablename__ = 'FEATURE'
   id = Column(Integer, primary_key = True, autoincrement = True)
   name = Column(String(40), nullable = False)
@@ -23,22 +23,21 @@ class FEATURE(Base):
   status = Column(String(20))
   feature_type = Column(String(100))
 
-  def __init__(self, name, description = None, created_by = None, status = None, feature_type = None):
+  def __init__(self, name, description = None, created_by = 0, status = None, feature_type = None):
     self.name = name
     self.description = description
     self.created_by = created_by
     self.status = status
     self.feature_type = feature_type
 
-class Doctor_Feature(Base):                                       #Association object - for implementing ManytoMany relationship
-  __tablename__ = 'DOCTOR_FEATURE_ASSOCIATION'
-  id= Column(Integer, primary_key = True)
-  user_id = Column(Integer,ForeignKey('USER.id', ondelete='CASCADE'), index = True)
-  feature_id = Column(Integer,ForeignKey('FEATURE.id', ondelete='CASCADE'),index = True)
+class User_Feature(Base):                                       #Association object - for implementing ManytoMany relationship
+  __tablename__ = 'USER_FEATURE_ASSOCIATION'
+  user_id = Column(Integer,ForeignKey('USER.id', ondelete='CASCADE'), primary_key=True)
+  feature_id = Column(Integer,ForeignKey('FEATURE.id', ondelete='CASCADE'),primary_key=True)
   like = Column(Integer)
   comment = Column(String(200))
 
-  def __init__(self, user_id, feature_id, like = 0, comment = None):
+  def __init__(self, user_id=0, feature_id=0, like=0, comment=None):
       self.user_id = user_id
       self.feature_id=feature_id
       self.like = like
