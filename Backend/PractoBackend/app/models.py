@@ -1,4 +1,4 @@
-from sqlalchemy import Column, Integer, String,Text,Table,ForeignKey
+from sqlalchemy import Column,Integer,String,Text,Boolean,Table,ForeignKey
 from sqlalchemy.orm import relationship,backref
 from database import Base
 
@@ -36,11 +36,11 @@ class User_Feature(Base):                                       #Association obj
   __tablename__ = 'USER_FEATURE_ASSOCIATION'
   user_id = Column(Integer,ForeignKey('USER.practo_id', ondelete='CASCADE'), primary_key=True)
   feature_id = Column(Integer,ForeignKey('FEATURE.id', ondelete='CASCADE'),primary_key=True)
-  like_count = Column(Integer)
+  like = Column(Boolean)
   comment = Column(String(200))
 
-  def __init__(self, user_id=0, feature_id=0, like_count=0, comment=None):
+  def __init__(self, user_id=0, feature_id=0, like=False, comment=None):
       self.user_id = user_id
       self.feature_id=feature_id
-      self.like_count = like_count
+      self.like = like
       self.comment = comment
