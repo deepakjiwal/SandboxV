@@ -4,7 +4,8 @@ from models import *
 import collections
 from database import init_db, db_session
 from app import app
-import InvalidUsage
+
+
 
 #@app.route('/')			#correct
 #def serveStatic():
@@ -39,6 +40,8 @@ def getAllFeatures():
 		feature_Detail = {'id': feature.id, 'name': feature.name, 'description': feature.description, 'created_by':feature.created_by, 'status':feature.status, 'feature_type':feature.feature_type}
 		feature_List.append(feature_Detail);
 		count = count + 1;
+		likeCount = db_session.query(Doctor_Feature).filter_by(feature_id = feature_Detail.id, like = 1)
+		print likeCount
 	return jsonify({'data':feature_List, 'total':count})
 	#return jsonify({'returnCode': "SUCCESS", 'data':feature_List, 'total':count}), 400
 
