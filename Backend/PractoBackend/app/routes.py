@@ -23,7 +23,7 @@ def addUser():
 	user = request.get_json()
 	row = db_session.query(User).filter_by(email=user['email']).count()
 	if row == 0:
-		new_user = User(user['name'],user['contact_number'],user['email'])
+		new_user = User(user['practo_id'], user['name'],user['contact_number'],user['email'])
 		db_session.add(new_user)
 		db_session.commit()
 		response = {'returnCode': "SUCCESS", 'data':{}, 'errorCode':None}
@@ -65,7 +65,6 @@ def editClinic():
 @app.route('/getAllFeatures', methods = ['GET'])		#checked correct
 def getAllFeatures():
 	all_Features = Feature.query.all()
-	print "hello"
 	feature_List = []
 	feature_Detail = {}
 	count = 0;
@@ -73,5 +72,8 @@ def getAllFeatures():
 		feature_Detail = {'id': feature.id, 'name': feature.name, 'description': feature.description, 'created_by':feature.created_by, 'status':feature.status, 'feature_type':feature.feature_type}
 		feature_List.append(feature_Detail);
 		count = count + 1;
+		likeCount = db_session.query(User_Feature).filter_by(feature_id = feature.id, like_count = 1)
+		#feature_Detail.up_vote = likeCount
+		print likeCount
 	return jsonify({'data':feature_List, 'total':count})
 	#return jsonify({'returnCode': "SUCCESS", 'data':feature_List, 'total':count}), 400
