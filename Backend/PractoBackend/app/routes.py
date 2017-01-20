@@ -4,6 +4,7 @@ from models import *
 import collections
 from database import init_db, db_session
 from app import app
+import InvalidUsage
 
 #@app.route('/')			#correct
 #def serveStatic():
@@ -27,17 +28,19 @@ def addUser():
 	response = {'returnCode': "SUCCESS", 'data':{}, 'errorCode':None}
 	return jsonify(response)
 
-@app.route('/getAllClinics', methods = ['GET'])
-def getAllClinics():								#checked Correct
-	# start = (int(page)-1)*10
-	# end = int(page)*10
-	all_Clinics = Clinic.query.all()
-	clinics_List = []
-	clinic_Detail={}
-	for clinic in all_Clinics:
-		clinic_Detail = {'id': clinic.id, 'name': clinic.name, 'location': clinic.location, 'city':clinic.city, 'address':clinic.address}
-		clinics_List.append(clinic_Detail);
-	return jsonify({'returnCode': "SUCCESS", 'data':clinics_List, 'errorCode':None})
+@app.route('/getAllFeatures', methods = ['GET'])		#checked correct
+def getAllFeatures():
+	all_Features = FEATURE.query.all()
+	print "hello"
+	feature_List = []
+	feature_Detail = {}
+	count = 0;
+	for feature in all_Features:
+		feature_Detail = {'id': feature.id, 'name': feature.name, 'description': feature.description, 'created_by':feature.created_by, 'status':feature.status, 'feature_type':feature.feature_type}
+		feature_List.append(feature_Detail);
+		count = count + 1;
+	return jsonify({'data':feature_List, 'total':count})
+	#return jsonify({'returnCode': "SUCCESS", 'data':feature_List, 'total':count}), 400
 
 @app.route('/deleteClinic',methods = ['POST'])		#checked Correct
 def deleteClinic():

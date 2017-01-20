@@ -23,7 +23,7 @@ class FEATURE(Base):
   status = Column(String(20))
   feature_type = Column(String(100))
 
-  def __init__(self, name, description = None, created_by = None, status = None, feature_type = None):
+  def __init__(self, name, description, created_by = 0, status = None, feature_type = None):
     self.name = name
     self.description = description
     self.created_by = created_by
