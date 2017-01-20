@@ -69,11 +69,16 @@ def getAllFeatures():
 	feature_Detail = {}
 	count = 0;
 	for feature in all_Features:
-		feature_Detail = {'id': feature.id, 'name': feature.name, 'description': feature.description, 'created_by':feature.created_by, 'status':feature.status, 'feature_type':feature.feature_type}
+		up_vote = db_session.query(User_Feature).filter_by(feature_id =
+		feature.id, like_count = 1).count()
+		down_vote = db_session.query(User_Feature).filter_by(feature_id =
+		feature.id, like_count = 0).count()
+		feature_Detail = {'id': feature.id, 'name': feature.name,
+		'description': feature.description, 'created_by':feature.created_by,
+		'status':feature.status, 'feature_type':feature.feature_type,
+		'up_vote': up_vote, 'down_vote': down_vote}
 		feature_List.append(feature_Detail);
 		count = count + 1;
-		likeCount = db_session.query(User_Feature).filter_by(feature_id = feature.id, like_count = 1)
-		#feature_Detail.up_vote = likeCount
-		print likeCount
+
 	return jsonify({'data':feature_List, 'total':count})
 	#return jsonify({'returnCode': "SUCCESS", 'data':feature_List, 'total':count}), 400
