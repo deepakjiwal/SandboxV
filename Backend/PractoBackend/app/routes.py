@@ -32,7 +32,6 @@ def addUser():
 @app.route('/getAllFeatures', methods = ['GET'])		#checked correct
 def getAllFeatures():
 	all_Features = FEATURE.query.all()
-	print "hello"
 	feature_List = []
 	feature_Detail = {}
 	count = 0;
@@ -40,7 +39,8 @@ def getAllFeatures():
 		feature_Detail = {'id': feature.id, 'name': feature.name, 'description': feature.description, 'created_by':feature.created_by, 'status':feature.status, 'feature_type':feature.feature_type}
 		feature_List.append(feature_Detail);
 		count = count + 1;
-		likeCount = db_session.query(Doctor_Feature).filter_by(feature_id = feature_Detail.id, like = 1)
+		likeCount = db_session.query(Doctor_Feature).filter_by(feature_id = feature.id, like_count = 1)
+		feature_Detail.up_vote = likeCount
 		print likeCount
 	return jsonify({'data':feature_List, 'total':count})
 	#return jsonify({'returnCode': "SUCCESS", 'data':feature_List, 'total':count}), 400

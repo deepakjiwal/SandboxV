@@ -35,11 +35,11 @@ class Doctor_Feature(Base):                                       #Association o
   id = Column(Integer, primary_key = True, autoincrement = True)
   user_id = Column(Integer,ForeignKey('USER.id', ondelete='CASCADE'), index = True)
   feature_id = Column(Integer,ForeignKey('FEATURE.id', ondelete='CASCADE'),index = True)
-  likeCount = Column(Integer)
+  like_count = Column(Integer)
   comment = Column(String(200))
 
-  def __init__(self, user_id, feature_id, likeCount = 0, comment = None):
+  def __init__(self, user_id, feature_id, like_count = 0, comment = None):
       self.user_id = user_id
       self.feature_id=feature_id
-      self.likeCount = likeCount
+      self.like_count = like_count
       self.comment = comment
