@@ -62,23 +62,59 @@ def editClinic():
 	response = {'returnCode': "SUCCESS", 'data':{}, 'errorCode':None}
 	return jsonify(response)
 
-@app.route('/getAllFeatures', methods = ['GET'])		#checked correct
-def getAllFeatures():
-	all_Features = Feature.query.all()
+@app.route('/getAllFeatures/', methods = ['GET'])
+@app.route('/getAllFeatures/<substr>/', methods = ['GET'])		#checked correct
+@app.route('/getAllFeatures/<int:practo_id>/', methods = ['GET'])
+@app.route('/getAllFeatures/<substr>/<int:practo_id>', methods = ['GET'])
+def getAllFeatures(substr = "", practo_id = 0):
+	print practo_id
+	print substr
+	if(practo_id == 0):
+		all_Features = Feature.query.filter(Feature.feature_type.startswith(substr.lower())).all()
+	else:
+		all_Features = db_session.query(Feature).filter(Feature.
+		feature_type.startswith(substr.lower())).filter_by(created_by = practo_id).all()
+
 	feature_List = []
 	feature_Detail = {}
 	count = 0;
 	for feature in all_Features:
-		up_vote = db_session.query(User_Feature).filter_by(feature_id =
+		up_vote_count = db_session.query(User_Feature).filter_by(feature_id =
 		feature.id, like_count = 1).count()
-		down_vote = db_session.query(User_Feature).filter_by(feature_id =
+		down_vote_count = db_session.query(User_Feature).filter_by(feature_id =
 		feature.id, like_count = 0).count()
+		upvote_status = False
+		downvote_status = False
+		if(practo_id != 0):
+			status = db_session.query(User_Feature).filter_by(user_id =
+			practo_id, feature_id = feature.id).one()
+			if (status.like_count == 1):
+				upvote_status = True
+			else:
+				downvote_status = True
 		feature_Detail = {'id': feature.id, 'name': feature.name,
 		'description': feature.description, 'created_by':feature.created_by,
 		'status':feature.status, 'feature_type':feature.feature_type,
-		'up_vote': up_vote, 'down_vote': down_vote}
+		'up_vote_count': up_vote_count, 'down_vote_count': down_vote_count,
+		'upvote_status': upvote_status, 'downvote_status': downvote_status}
 		feature_List.append(feature_Detail);
 		count = count + 1;
 
 	return jsonify({'data':feature_List, 'total':count})
 	#return jsonify({'returnCode': "SUCCESS", 'data':feature_List, 'total':count}), 400
+
+
+@app.route('/getAllApproved/', methods = ['GET'])
+def getAllApprovedFeatures():
+	all_Features = Feature.query.filter_by(status = 'approved').all()
+	feature_List = []
+	feature_Detail = {}
+	count = 0;
+	for feature in all_Features:
+		feature_Detail = {'id': feature.id, 'name': feature.name,
+		'description': feature.description, 'created_by':feature.created_by,
+		'status':feature.status, 'feature_type':feature.feature_type}
+		feature_List.append(feature_Detail);
+		count = count + 1;
+
+	return jsonify({'data':feature_List, 'total':count})
