@@ -6,12 +6,12 @@ class User(Base):
   __tablename__ = 'USER'
   id = Column(Integer,primary_key = True, autoincrement=True)
   name = Column(String(50), nullable=False)
-  contactNumber = Column(String(15))
+  contact_number = Column(String(15))
   email = Column(String(50))
 
-  def __init__(self, name, contactNumber = None, email = None):
+  def __init__(self, name, contact_number = None, email = None):
     self.name = name
-    self.contactNumber = contactNumber
+    self.contact_number = contact_number
     self.email = email
 
 class FEATURE(Base):
@@ -23,7 +23,7 @@ class FEATURE(Base):
   status = Column(String(20))
   feature_type = Column(String(100))
 
-  def __init__(self, name, description = None, upCount = 0, downCount = 0, created_by = 0, status = None, feature_type = None):
+  def __init__(self, name, description = None, created_by = None, status = None, feature_type = None):
     self.name = name
     self.description = description
     self.created_by = created_by

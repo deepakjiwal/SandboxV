@@ -18,11 +18,11 @@ def static_proxy(path):
   # send_static_file will guess the correct MIME type
   return app.send_static_file(path)
 
-@app.route('/addClinic', methods = ['POST'])		#checked  correct
-def addClinic():
+@app.route('/addUser', methods = ['POST'])		#checked  correct
+def addUser():
 	post = request.get_json()
-	new_Clinic = Clinic(post['name'],post['location'],post['city'],post['address'])
-	db_session.add(new_Clinic)
+	new_user = User(post['name'],post['contact_number'],post['email'])
+	db_session.add(new_user)
 	db_session.commit()
 	response = {'returnCode': "SUCCESS", 'data':{}, 'errorCode':None}
 	return jsonify(response)
