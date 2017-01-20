@@ -1,0 +1,27 @@
+@import url('http://cdnjs.cloudflare.com/ajax/libs/select2/3.4.8/select2.css');
+@import url('http://cdnjs.cloudflare.com/ajax/libs/select2/3.4.8/select2-bootstrap.css');
+
+body{
+	display:flex;
+	flex-direction:column;
+}
+
+.container {
+	flex:1;
+	width:100%;
+}
+
+.headerLogo {
+	float:left;
+}
+
+#header {
+	height: 50px;
+	position: relative;
+	width: 100%;
+	margin: 0 auto;
+}
+
+.table td,th {
+	text-align:center !important;
+}
