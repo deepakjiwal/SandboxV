@@ -5,6 +5,7 @@ from database import Base
 class User(Base):
   __tablename__ = 'USER'
   id = Column(Integer,primary_key = True, autoincrement=True)
+  practo_id = Column(Integer, nullable=False, unique=True)
   name = Column(String(50), nullable=False)
   contact_number = Column(String(15))
   email = Column(String(50))
@@ -23,7 +24,7 @@ class Feature(Base):
   status = Column(String(20))
   feature_type = Column(String(100))
 
-  def __init__(self, name, description = None, created_by = 0, status = None, feature_type = None):
+  def __init__(self, name, description, created_by = 0, status = None, feature_type = None):
     self.name = name
     self.description = description
     self.created_by = created_by
@@ -32,7 +33,7 @@ class Feature(Base):
 
 class User_Feature(Base):                                       #Association object - for implementing ManytoMany relationship
   __tablename__ = 'USER_FEATURE_ASSOCIATION'
-  user_id = Column(Integer,ForeignKey('USER.id', ondelete='CASCADE'), primary_key=True)
+  user_id = Column(Integer,ForeignKey('USER.practo_id', ondelete='CASCADE'), primary_key=True)
   feature_id = Column(Integer,ForeignKey('FEATURE.id', ondelete='CASCADE'),primary_key=True)
   like = Column(Integer)
   comment = Column(String(200))
