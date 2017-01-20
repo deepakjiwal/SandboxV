@@ -36,11 +36,11 @@ class User_Feature(Base):                                       #Association obj
   __tablename__ = 'USER_FEATURE_ASSOCIATION'
   user_id = Column(Integer,ForeignKey('USER.practo_id', ondelete='CASCADE'), primary_key=True)
   feature_id = Column(Integer,ForeignKey('FEATURE.id', ondelete='CASCADE'),primary_key=True)
-  like = Column(Boolean)
+  liked = Column(Boolean)
   comment = Column(String(200))
 
-  def __init__(self, user_id=0, feature_id=0, like=False, comment=None):
+  def __init__(self, user_id=0, feature_id=0, liked=False, comment=None):
       self.user_id = user_id
       self.feature_id=feature_id
-      self.like = like
+      self.liked = liked
       self.comment = comment

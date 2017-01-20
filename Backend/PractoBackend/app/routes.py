@@ -69,12 +69,16 @@ def getAllFeatures():
 	feature_Detail = {}
 	count = 0;
 	for feature in all_Features:
-		feature_Detail = {'id': feature.id, 'name': feature.name, 'description': feature.description, 'created_by':feature.created_by, 'status':feature.status, 'feature_type':feature.feature_type}
+		up_vote = db_session.query(User_Feature).filter_by(feature_id =
+		feature.id, liked = True).count()
+		down_vote = db_session.query(User_Feature).filter_by(feature_id =
+		feature.id, liked = False).count()
+		feature_Detail = {'id': feature.id, 'name': feature.name,
+		'description': feature.description, 'created_by':feature.created_by,
+		'status':feature.status, 'feature_type':feature.feature_type,
+		'up_vote': up_vote, 'down_vote': down_vote}
 		feature_List.append(feature_Detail);
 		count = count + 1;
-		likeCount = db_session.query(User_Feature).filter_by(feature_id = feature.id, like = True)
-		#feature_Detail.up_vote = likeCount
-		print likeCount
 	return jsonify({'data':feature_List, 'total':count})
 	#return jsonify({'returnCode': "SUCCESS", 'data':feature_List, 'total':count}), 400
 
@@ -85,16 +89,16 @@ def vote():
 	like = vote['like']
 	if like:
 		up_vote_cursor = db_session.query(User_Feature).filter_by(feature_id =
-		vote['feature_id'], user_id = vote['user_id'], like = True)
+		vote['feature_id'], user_id = vote['user_id'], liked = True)
 		if up_vote_cursor.count() > 0:
 			row_to_delete= up_vote_cursor.first()
 			db_session.delete(row_to_delete)
 			db_session.commit()
 		else:
 			down_vote_cursor = db_session.query(User_Feature).filter_by(feature_id =
-			vote['feature_id'], user_id = vote['user_id'], like = False)
+			vote['feature_id'], user_id = vote['user_id'], liked = False)
 			if down_vote_cursor.count() > 0:
-				down_vote_cursor.update({'like':True})
+				down_vote_cursor.update({'liked':True})
 			else:
 				user_feature = User_Feature(vote['user_id'],vote['feature_id'],
 				True,vote['comment'])
@@ -102,16 +106,16 @@ def vote():
 				db_session.commit()
 	else:
 		down_vote_cursor = db_session.query(User_Feature).filter_by(feature_id =
-		vote['feature_id'], user_id = vote['user_id'], like = False)
+		vote['feature_id'], user_id = vote['user_id'], liked = False)
 		if down_vote_cursor.count() > 0:
 			row_to_delete= down_vote_cursor.first()
 			db_session.delete(row_to_delete)
 			db_session.commit()
 		else:
 			up_vote_cursor = db_session.query(User_Feature).filter_by(feature_id
-			= vote['feature_id'], user_id = vote['user_id'], like = True)
+			= vote['feature_id'], user_id = vote['user_id'], liked = True)
 			if up_vote_cursor.count() > 0:
-				up_vote_cursor.update({'like':False})
+				up_vote_cursor.update({'liked':False})
 			else:
 				user_feature = User_Feature(vote['user_id'],vote['feature_id'],
 				False,vote['comment'])
@@ -119,9 +123,9 @@ def vote():
 				db_session.commit()
 
 	up_vote_count = db_session.query(User_Feature).filter_by(feature_id =
-	vote['feature_id'], like = True).count()
+	vote['feature_id'], liked = True).count()
 	down_vote_count = db_session.query(User_Feature).filter_by(feature_id =
-	vote['feature_id'], like = False).count()
+	vote['feature_id'], liked = False).count()
 	response = {'returnCode': "SUCCESS", 'up_vote_count': up_vote_count,
 	'down_vote_count': down_vote_count, 'errorCode':None}
 	return jsonify(response)
