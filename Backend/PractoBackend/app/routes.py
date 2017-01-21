@@ -91,12 +91,9 @@ def getAllFeatures(substr = "", practo_id = 0, others = 0):
 		feature.id, liked = False).count()
 		upvote_status = False
 		downvote_status = False
-		print practo_id
 		if(practo_id != 0):
-			print feature.id
 			status = db_session.query(User_Feature).filter_by(user_id =
 			practo_id, feature_id = feature.id).first()
-			print status
 			if (status != None):
 				if (status.liked == 1):
 					upvote_status = True
@@ -131,24 +128,26 @@ def getAllApprovedFeatures():
 
 @app.route('/vote', methods =['POST'])		#checked Correct
 def vote():
-	print "In VOte"
 	vote = request.get_json()
+	upvote_status = False
+	downvote_status = False
 	like = vote['like']
 	if like:
 		up_vote_cursor = db_session.query(User_Feature).filter_by(feature_id =
 		vote['feature_id'], user_id = vote['user_id'], liked = True)
 		if up_vote_cursor.count() > 0:
+			upvote_status = False
 			row_to_delete= up_vote_cursor.first()
 			db_session.delete(row_to_delete)
 			db_session.commit()
 		else:
+			upvote_status = True
 			down_vote_cursor = db_session.query(User_Feature).filter_by(feature_id =
 			vote['feature_id'], user_id = vote['user_id'], liked = False)
 			if down_vote_cursor.count() > 0:
 				down_vote_cursor.update({'liked':True})
 				db_session.commit()
 			else:
-				print "HERE"
 				user_feature = User_Feature(vote['user_id'],vote['feature_id'],
 				True,vote['comment'])
 				db_session.add(user_feature)
@@ -157,10 +156,12 @@ def vote():
 		down_vote_cursor = db_session.query(User_Feature).filter_by(feature_id =
 		vote['feature_id'], user_id = vote['user_id'], liked = False)
 		if down_vote_cursor.count() > 0:
+			downvote_status = False
 			row_to_delete= down_vote_cursor.first()
 			db_session.delete(row_to_delete)
 			db_session.commit()
 		else:
+			downvote_status = True
 			up_vote_cursor = db_session.query(User_Feature).filter_by(feature_id
 			= vote['feature_id'], user_id = vote['user_id'], liked = True)
 			if up_vote_cursor.count() > 0:
@@ -176,5 +177,6 @@ def vote():
 	down_vote_count = db_session.query(User_Feature).filter_by(feature_id =
 	vote['feature_id'], liked = False).count()
 	response = {'returnCode': "SUCCESS", 'up_vote_count': up_vote_count,
-	'down_vote_count': down_vote_count, 'errorCode':None}
+	'down_vote_count': down_vote_count, 'upvote_status': upvote_status,
+	'downvote_status': downvote_status, 'errorCode':None}
 	return jsonify(response)
