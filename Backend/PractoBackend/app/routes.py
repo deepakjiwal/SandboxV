@@ -109,20 +109,23 @@ def isFeatureSemanticallyCorrect(featureDescription1, featureDescription2):
 def addFeature():
 	feature = request.get_json()
 	currentDescription = feature['description']
+	print feature['description']
 	all_Features = db_session.query(Feature).filter_by(feature_type = feature['feature_type']).all()
 	matchingFeaturesList = []
 	feature_Detail = {}
-	for feature in all_Features:
-		if isFeatureSemanticallyCorrect(feature.description,currentDescription):
-			feature_Detail = {'id': feature.id, 'name': feature.name,
-			'description': feature.description, 'created_by':feature.created_by,
-			'status':feature.status, 'feature_type':feature.feature_type }
+	for features in all_Features:
+		if isFeatureSemanticallyCorrect(features.description,currentDescription):
+			feature_Detail = {'id': features.id, 'name': features.name,
+			'description': features.description, 'created_by':features.created_by,
+			'status':features.status, 'feature_type':features.feature_type }
 			matchingFeaturesList.append(feature_Detail)
 	if len(matchingFeaturesList) > 0:
 		print matchingFeaturesList
 		response = {'returnCode': "SUCCESS", 'data':matchingFeaturesList, 'errorCode':None}
 		return jsonify(response),409
 	else:
+		print "abcd"
+		print feature['name']
 		new_feature = Feature(feature['name'],feature['description'],
 		feature['created_by'],feature['status'],feature['feature_type'])
 		db_session.add(new_feature)
