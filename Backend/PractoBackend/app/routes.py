@@ -4,6 +4,9 @@ from models import *
 import collections
 from database import init_db, db_session
 from app import app
+from textblob import TextBlob
+from textblob import Word
+from textblob.wordnet import VERB
 
 #@app.route('/')			#correct
 #def serveStatic():
@@ -32,15 +35,103 @@ def addUser():
 		response = {'returnCode': "CONFLICT", 'data':{}, 'errorCode':None}
 		return jsonify(response), 409
 
+def isFeatureSemanticallyCorrect(featureDescription1, featureDescription2):
+
+    listStoppingWords = ["a","about","above","after","again","against",
+	"all","am","an","and","any","are","aren't","as","at","be","because",
+	"been","before","being","below","between","both","but","by","can't",
+	"cannot","could","couldn't","did","didn't","do","does","doesn't","doing"
+	"don't","down","during","each","few","for","from","further","had","hadn't",
+	"has","hasn't","have","haven't","having","he","he'd","he'll","he's","her"
+	"here","here's","hers","herself","him","himself","his","how","how's",
+	"i","i'd","i'll","i'm","i've","if","in","into","is","isn't","it","it's",
+	"its","itself","let's","me","more","most","mustn't","my","myself","no",
+	"nor","not","of","off","on","once","only","or","other","ought","our","ours",
+	"ourselves","out","over","own","same","shan't","she","she'd","she'll",
+	"she's","should","shouldn't","so","some","such","than","that","that's",
+	"the","their","theirs","them","themselves","then","there","there's","these",
+	"they","they'd","they'll","they're","they've","this","those","through","to",
+	"too","under","until","up","very","was","wasn't","we","we'd","we'll","we're",
+	"we've","were","weren't","what","what's","when","when's","where","where's",
+	"which","while","who","who's","whom","why","why's","with","won't","would",
+	"wouldn't","you","you'd","you'll","you're","you've","your","yours","yourself",
+	"yourselves","needed","required"]
+    featureDescription1 = TextBlob(featureDescription1)
+    featureDescription2 = TextBlob(featureDescription2)
+    finalfeatureDescription1 = []
+    for word in featureDescription1.words:
+        if not word in listStoppingWords:
+            finalfeatureDescription1.append(word)
+	finalfeatureDescription2 = []
+    for word in featureDescription2.words:
+        if not word in listStoppingWords:
+            finalfeatureDescription2.append(word)
+    finalFeatureDescription1Str = ' '.join(finalfeatureDescription1)
+    finalFeatureDescription2Str = ' '.join(finalfeatureDescription2)
+    finalFeatureDescription1Str = TextBlob(finalFeatureDescription1Str)
+    finalFeatureDescription2Str = TextBlob(finalFeatureDescription2Str)
+    finalFeatureDescription1Str = finalFeatureDescription1Str.correct()
+    finalFeatureDescription2Str = finalFeatureDescription2Str.correct()
+    featureDesc1LemList = []
+    for word in finalFeatureDescription1Str.words:
+        featureDesc1LemList.append(word.lemmatize())
+    featureDesc2LemList = []
+    for word in finalFeatureDescription2Str.words:
+        featureDesc2LemList.append(word.lemmatize())
+    featureDesc1LemStr = ' '.join(featureDesc1LemList)
+    featureDesc2LemStr = ' '.join(featureDesc2LemList)
+    featureDesc1LemStr = TextBlob(featureDesc1LemStr)
+    featureDesc2LemStr = TextBlob(featureDesc2LemStr)
+    featureDescription1synsets = []
+    for word in featureDesc1LemStr.words:
+		for synset in word.synsets:
+			featureDescription1synsets.append(synset)
+    featureDescription2synsets = []
+    for word in featureDesc2LemStr.words:
+        for synset in word.synsets:
+            featureDescription2synsets.append(synset)
+    commonSynsets = []
+    commonSynsets = list(set(featureDescription1synsets).intersection(featureDescription2synsets))
+    commonSynsetsCount = len(commonSynsets)
+    if(commonSynsetsCount > 0):
+        feature1SynsetCount = len(featureDescription1synsets)
+        feature2SynsetCount = len(featureDescription2synsets)
+        percentage = ((commonSynsetsCount * 200) / (feature1SynsetCount + feature2SynsetCount))
+        if(percentage > 25):
+            return True
+        else:
+            return False
+    else:
+        return False
+
+
 @app.route('/addFeature', methods = ['POST'])		#checked  correct
 def addFeature():
 	feature = request.get_json()
-	new_feature = Feature(feature['name'],feature['description'],
-	feature['created_by'],feature['status'],feature['feature_type'].lower())
-	db_session.add(new_feature)
-	db_session.commit()
-	response = {'returnCode': "SUCCESS", 'data':{}, 'errorCode':None}
-	return jsonify(response)
+	currentDescription = feature['description']
+	print feature['description']
+	all_Features = db_session.query(Feature).filter_by(feature_type = feature['feature_type']).all()
+	matchingFeaturesList = []
+	feature_Detail = {}
+	for features in all_Features:
+		if isFeatureSemanticallyCorrect(features.description,currentDescription):
+			feature_Detail = {'id': features.id, 'name': features.name,
+			'description': features.description, 'created_by':features.created_by,
+			'status':features.status, 'feature_type':features.feature_type }
+			matchingFeaturesList.append(feature_Detail)
+	if len(matchingFeaturesList) > 0:
+		print matchingFeaturesList
+		response = {'returnCode': "SUCCESS", 'data':matchingFeaturesList, 'errorCode':None}
+		return jsonify(response),409
+	else:
+		print "abcd"
+		print feature['name']
+		new_feature = Feature(feature['name'],feature['description'],
+		feature['created_by'],feature['status'],feature['feature_type'])
+		db_session.add(new_feature)
+		db_session.commit()
+		response = {'returnCode': "SUCCESS", 'data':{}, 'errorCode':None}
+		return jsonify(response)
 
 @app.route('/deleteFeature',methods = ['DELETE'])		#checked Correct
 def deleteClinic():
